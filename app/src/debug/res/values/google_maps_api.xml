@@ -1,0 +1,21 @@
+<resources>
+    <!--
+    TODO: Before you run your application, you need a Google Maps API key.
+
+    To get one, follow this link, follow the directions and press "Create" at the end:
+
+    https://console.developers.google.com/flows/enableapi?apiid=maps_android_backend&keyType=CLIENT_SIDE_ANDROID&r=0E:F9:73:0B:91:E2:EB:D8:18:E1:91:68:78:57:0E:39:5B:A1:34:54%3Bcom.example.sangt.find_spots
+
+    You can also add your credentials to an existing key, using this line:
+    0E:F9:73:0B:91:E2:EB:D8:18:E1:91:68:78:57:0E:39:5B:A1:34:54;com.example.sangt.find_spots
+
+    Alternatively, follow the directions here:
+    https://developers.google.com/maps/documentation/android/start#get-key
+
+    Once you have your key (it starts with "AIza"), replace the "google_maps_key"
+    string in this file.
+    -->
+    <string name="google_maps_key" templateMergeStrategy="preserve" translatable="false">
+        AIzaSyBXkHk4BVYUylHUQLG9gGrTotBx0LVXXkg
+    </string>
+</resources>

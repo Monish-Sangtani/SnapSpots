@@ -1,0 +1,50 @@
+{
+  "project_info": {
+    "project_number": "539794902710",
+    "firebase_url": "https://snapspots-14595.firebaseio.com",
+    "project_id": "snapspots-14595",
+    "storage_bucket": "snapspots-14595.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:539794902710:android:9eed55c4ead385ec",
+        "android_client_info": {
+          "package_name": "com.example.sangt.find_spots"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "539794902710-bcm5tn1bk7u3kmq50ej3b5k9ujl9ci8s.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAaoIZUkFbpoZku7NJ6C1dhRlAFSD8sx6o"
+        },
+        {
+          "current_key": "AIzaSyAfG_XCHvlZ07YyYOdpmapnqErxDO6PrNg"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "539794902710-bcm5tn1bk7u3kmq50ej3b5k9ujl9ci8s.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
