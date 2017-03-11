@@ -17,13 +17,16 @@ public class Photo {
     private String expirationDate;
     private String comment;
     private String creator;
+    private String encodedImage;
 
-    public Photo(Location location, String creationDate, String expirationDate, String comment, String creator){
+    public Photo(Location location, String creationDate, String expirationDate, String comment, String creator, String encodedImage){
         setLocation(location);
         setCreationDate(creationDate);
         setExpirationDate(expirationDate);
         setComment(comment);
         setCreator(creator);
+        setEncodedImage(encodedImage);
+
     }
 
 
@@ -75,6 +78,14 @@ public class Photo {
 
     public void setCreator(String creator) {
         this.creator = creator;
+    }
+
+    public String getEncodedImage() {
+        return encodedImage;
+    }
+
+    public void setEncodedImage(String encodedImage) {
+        this.encodedImage = encodedImage;
     }
     //---------------------------------------------------------------------
 
