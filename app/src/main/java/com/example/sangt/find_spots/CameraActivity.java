@@ -50,7 +50,7 @@ public class CameraActivity extends AppCompatActivity {
     }
 
 
-    //Just shows the general idea of how I usually get things from the database
+    //Just shows the general idea of how I usually get things from the database.
     private void getPictures (){
         //Same idea as above: get reference to database
         FirebaseDatabase database = FirebaseDatabase.getInstance();
