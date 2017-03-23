@@ -2,19 +2,28 @@ package com.example.sangt.find_spots;
 import android.Manifest;
 
 
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
+import android.location.Criteria;
+import android.location.Location;
+import android.location.LocationManager;
 import android.os.Build;
 import android.provider.MediaStore;
 import android.support.annotation.RequiresApi;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
 
+import com.google.android.gms.instantapps.PackageManagerWrapper;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -23,6 +32,8 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.firebase.auth.FirebaseAuth;
+
+import java.io.ByteArrayOutputStream;
 
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback, GoogleMap.OnMarkerClickListener {
 
@@ -120,5 +131,23 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         Log.d("D","SWAG");
         return false;
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data){
+        if(requestCode == 111 && resultCode == this.RESULT_OK){
+            Intent cameraIntent = new Intent( this, CameraActivity.class);
+            cameraIntent.putExtras(data.getExtras());
+            LocationManager locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+            Criteria criteria = new Criteria();
+            try {
+                Location loc = locationManager.getLastKnownLocation(locationManager.getBestProvider(criteria, false));
+                cameraIntent.putExtra("location", loc);
+
+            }catch (SecurityException e){
+                e.printStackTrace();
+            }
+            startActivity(cameraIntent);
+        }
     }
 }

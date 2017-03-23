@@ -1,27 +1,99 @@
 package com.example.sangt.find_spots;
 
+import android.graphics.Bitmap;
 import android.graphics.Picture;
+import android.location.Location;
+import android.net.Uri;
 import android.os.Debug;
+import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.widget.Toast;
 
+import com.google.android.gms.fitness.data.Goal;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.UploadTask;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.HashMap;
 
+import static android.R.attr.data;
+
 public class CameraActivity extends AppCompatActivity {
+
+    FirebaseUser mUser;
+    FirebaseAuth mAuth;
+    FirebaseDatabase mDatabase;
+    StorageReference mStorageRef;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+
+
+        mAuth = FirebaseAuth.getInstance();
+        mUser = mAuth.getCurrentUser();
+        mDatabase = FirebaseDatabase.getInstance();
+        mStorageRef = FirebaseStorage.getInstance().getReference();
+
         setContentView(R.layout.activity_camera);
+//        Bundle extras = savedInstanceState.getExtras();
+        Bitmap imageBitmap = (Bitmap) savedInstanceState.get("data");
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        imageBitmap.compress(Bitmap.CompressFormat.PNG, 100, baos);
+        byte[] imageData = baos.toByteArray();
+        Location loc = (Location) savedInstanceState.get("location");
+        addImageToDatabase(mUser.getUid(), loc, imageData);
 
     }
+
+    private void addImageToDatabase(String clientId, Location location, byte[] imageData){
+        final DatabaseReference pictures = mDatabase.getReference("pictures").child(clientId);
+        final String imageKey = pictures.push().getKey();
+
+        Calendar calObj = Calendar.getInstance();
+        SimpleDateFormat dateFormat = new SimpleDateFormat("MM/dd/yy hh:mm:ss");
+        String date = dateFormat.format(calObj.getTime());
+        final Photo pic = new Photo(location, date, "", "", clientId);
+        pic.setId(imageKey);
+
+        ByteArrayInputStream inputStream = new ByteArrayInputStream(imageData);
+        StorageReference storageRef = mStorageRef.child("pictures/" + clientId + "/" + imageKey + ".png");
+        UploadTask uploadTask = storageRef.putStream(inputStream);
+        uploadTask.addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+            @Override
+            public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                @SuppressWarnings("VisibleForTests") Uri uri = taskSnapshot.getDownloadUrl();
+                pic.setUri(uri.toString());
+                HashMap<String, Object> temp = new HashMap<>();
+                temp.put(imageKey, pic);
+                pictures.updateChildren(temp);
+//                Toast.makeText(getParentActivityIntent(), "Picture saved!", Toast.LENGTH_SHORT).show();
+            }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+
+            }
+        });
+    }
+
+
 
     //This places the picture information in the database
     private void savePicture(Photo photo){
