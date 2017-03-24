@@ -70,7 +70,7 @@ public class CameraActivity extends AppCompatActivity {
         Calendar calObj = Calendar.getInstance();
         SimpleDateFormat dateFormat = new SimpleDateFormat("MM/dd/yy hh:mm:ss");
         String date = dateFormat.format(calObj.getTime());
-        final Photo pic = new Photo(location, date, "", "comment", clientId);
+        final Photo pic = new Photo(location, date, "", "picture comment", clientId);
         pic.setId(imageKey);
 
         ByteArrayInputStream inputStream = new ByteArrayInputStream(imageData);
