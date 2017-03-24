@@ -50,14 +50,15 @@ public class CameraActivity extends AppCompatActivity {
         mUser = mAuth.getCurrentUser();
         mDatabase = FirebaseDatabase.getInstance();
         mStorageRef = FirebaseStorage.getInstance().getReference();
+        Bundle extras = getIntent().getExtras();
 
         setContentView(R.layout.activity_camera);
 //        Bundle extras = savedInstanceState.getExtras();
-        Bitmap imageBitmap = (Bitmap) savedInstanceState.get("data");
+        Bitmap imageBitmap = (Bitmap) extras.get("data");
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         imageBitmap.compress(Bitmap.CompressFormat.PNG, 100, baos);
         byte[] imageData = baos.toByteArray();
-        Location loc = (Location) savedInstanceState.get("location");
+        Location loc = (Location) extras.get("location");
         addImageToDatabase(mUser.getUid(), loc, imageData);
 
     }

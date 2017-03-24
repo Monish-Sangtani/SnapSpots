@@ -55,7 +55,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 //Intent openCamera = new Intent(MapsActivity.this,CameraActivity.class);
                 Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
                 if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
-                    startActivityForResult(takePictureIntent, 1);
+                    startActivityForResult(takePictureIntent, 111);
                 }
 
 
@@ -107,12 +107,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         }
 
         try {
-            mMap.setMyLocationEnabled(true);
+             mMap.setMyLocationEnabled(true);
         } catch (SecurityException e) {
             Log.d("D","NO PERMISION NO PERMISSION" );
         }
-
-
 
 
     }
