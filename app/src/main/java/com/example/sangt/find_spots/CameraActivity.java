@@ -70,7 +70,7 @@ public class CameraActivity extends AppCompatActivity {
         Calendar calObj = Calendar.getInstance();
         SimpleDateFormat dateFormat = new SimpleDateFormat("MM/dd/yy hh:mm:ss");
         String date = dateFormat.format(calObj.getTime());
-        final Photo pic = new Photo(location, date, "", "", clientId);
+        final Photo pic = new Photo(location, date, "", "comment", clientId);
         pic.setId(imageKey);
 
         ByteArrayInputStream inputStream = new ByteArrayInputStream(imageData);
@@ -85,6 +85,7 @@ public class CameraActivity extends AppCompatActivity {
                 temp.put(imageKey, pic);
                 pictures.updateChildren(temp);
 //                Toast.makeText(getParentActivityIntent(), "Picture saved!", Toast.LENGTH_SHORT).show();
+
             }
         }).addOnFailureListener(new OnFailureListener() {
             @Override
