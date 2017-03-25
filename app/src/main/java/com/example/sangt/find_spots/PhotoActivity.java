@@ -5,6 +5,7 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
@@ -12,6 +13,8 @@ import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 import com.google.firebase.storage.*;
+
+import java.util.ArrayList;
 
 public class PhotoActivity extends AppCompatActivity {
     private ImageView image;
@@ -22,6 +25,13 @@ public class PhotoActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_photo);
         setTitle("View Photos");
+
+        ArrayList<String> photoIds = (ArrayList<String>)getIntent().getSerializableExtra("photos");
+
+        for(String x: photoIds)
+        {
+            Log.d("SWAG: "+x,"d");
+        }
 
         image = (ImageView) findViewById(R.id.current_picture);
         description = (TextView) findViewById(R.id.current_picture_description);
