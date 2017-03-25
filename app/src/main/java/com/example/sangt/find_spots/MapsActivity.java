@@ -33,13 +33,27 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.firebase.auth.FirebaseAuth;
 
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
+
 import java.io.ByteArrayOutputStream;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback, GoogleMap.OnMarkerClickListener {
 
     private GoogleMap mMap;
     private Button btnAddSpot;
     private FirebaseAuth auth;
+
+    //private ClusterManager<MyItem> mClusterManager;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,6 +62,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
+
+        getPictures();
         btnAddSpot= (Button) findViewById(R.id.btn_add);
         btnAddSpot.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -94,8 +110,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         // Add a marker in Sydney and move the camera
 
-        mMap.addMarker(new MarkerOptions().position(sydney).title("Marker in Sydney"));
-        mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney));
+        //mMap.addMarker(new MarkerOptions().position(sydney).title("Marker in Sydney"));
+        getPictures();
+       // mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney));
         mMap.setOnMarkerClickListener(this);
 
 
@@ -115,21 +132,89 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     }
 
-
-    LatLng sydney = new LatLng(-34, 151);
-
-
     @Override
     public boolean onMarkerClick(Marker marker) {
 
+        ArrayList<String> photosToSend = new ArrayList<String>();
 
+        for(int i=0;i<markers.size();i++)
+        {
+            if(marker.getPosition().equals(markers.get(i).getPosition()))
+            {
+                photosToSend.add(0,photosToView.get(i));
+            }
+            else
+            {
+                if(mMap.getProjection().getVisibleRegion().latLngBounds.contains(markers.get(i).getPosition()))
+                {
+                    photosToSend.add(photosToView.get(i));
+                }
+            }
+
+        }
         Intent myIntent = new Intent(MapsActivity.this, PhotoActivity.class);
+
+
+
+
+        myIntent.putExtra("photos", photosToSend);
+
+
         startActivity(myIntent);
-
-
-        Log.d("D","SWAG");
         return false;
     }
+
+    ArrayList<String> photosToView = new ArrayList<String>();
+    private void getPictures () {
+        //Same idea as above: get reference to database
+        FirebaseDatabase database = FirebaseDatabase.getInstance();
+
+
+        DatabaseReference photosRef = database.getReference("pictures").child("CSLgZ1y7yWTTOoZRqUCbIwlnZP13");
+
+
+        //Add listener to database to get values
+        photosRef.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+
+
+                markers = new ArrayList<MarkerOptions>();
+
+                for (DataSnapshot photoX: dataSnapshot.getChildren()) {
+                    if(photoX.child("location")!=null&&photoX.child("location").child("longitude")!=null&&photoX.child("location").child("latitude")!=null) {
+
+                        if(photoX.child("location").child("longitude").getValue()!=null&&photoX.child("location").child("latitude").getValue()!=null)
+                        {
+                            Double longitude = (Double) photoX.child("location").child("longitude").getValue();
+                            Double latitude = (Double) photoX.child("location").child("latitude").getValue();
+
+                            photosToView.add(photoX.getKey().toString());
+                            Log.d(photoX.getKey().toString(), "d");
+
+                            LatLng tempLoc = new LatLng(latitude, longitude);
+
+                            MarkerOptions tempMarker = new MarkerOptions().position(tempLoc);
+                            markers.add(tempMarker);
+                            mMap.addMarker(tempMarker);
+
+                        }
+
+                    }
+
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                //Error catching here
+            }
+        });
+
+
+
+    }
+ArrayList<MarkerOptions> markers ;
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data){
