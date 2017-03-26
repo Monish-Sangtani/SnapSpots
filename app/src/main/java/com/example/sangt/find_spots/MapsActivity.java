@@ -1,4 +1,5 @@
 package com.example.sangt.find_spots;
+
 import android.Manifest;
 
 
@@ -64,7 +65,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 .findFragmentById(R.id.map);
 
         getPictures();
-        btnAddSpot= (Button) findViewById(R.id.btn_add);
+        btnAddSpot = (Button) findViewById(R.id.btn_add);
         btnAddSpot.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -80,15 +81,15 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         auth = FirebaseAuth.getInstance();
         if (auth.getCurrentUser() != null) {
-            Toast.makeText(getApplication(), auth.getCurrentUser().getEmail()+" Logged In Successfully",Toast.LENGTH_LONG).show();
+            Toast.makeText(getApplication(), auth.getCurrentUser().getEmail() + " Logged In Successfully", Toast.LENGTH_LONG).show();
         }
 
         mapFragment.getMapAsync(this);
     }
 
 
-    private static final String[] INITIAL_PERMS={
-        Manifest.permission.ACCESS_FINE_LOCATION,
+    private static final String[] INITIAL_PERMS = {
+            Manifest.permission.ACCESS_FINE_LOCATION,
             Manifest.permission.ACCESS_COARSE_LOCATION
     };
 
@@ -107,12 +108,11 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         mMap = googleMap;
 
 
-
         // Add a marker in Sydney and move the camera
 
         //mMap.addMarker(new MarkerOptions().position(sydney).title("Marker in Sydney"));
         getPictures();
-       // mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney));
+        // mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney));
         mMap.setOnMarkerClickListener(this);
 
 
@@ -124,9 +124,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         }
 
         try {
-             mMap.setMyLocationEnabled(true);
+            mMap.setMyLocationEnabled(true);
         } catch (SecurityException e) {
-            Log.d("D","NO PERMISION NO PERMISSION" );
+            Log.d("D", "NO PERMISION NO PERMISSION");
         }
 
 
@@ -137,24 +137,17 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         ArrayList<String> photosToSend = new ArrayList<String>();
 
-        for(int i=0;i<markers.size();i++)
-        {
-            if(marker.getPosition().equals(markers.get(i).getPosition()))
-            {
-                photosToSend.add(0,photosToView.get(i));
-            }
-            else
-            {
-                if(mMap.getProjection().getVisibleRegion().latLngBounds.contains(markers.get(i).getPosition()))
-                {
+        for (int i = 0; i < markers.size(); i++) {
+            if (marker.getPosition().equals(markers.get(i).getPosition())) {
+                photosToSend.add(0, photosToView.get(i));
+            } else {
+                if (mMap.getProjection().getVisibleRegion().latLngBounds.contains(markers.get(i).getPosition())) {
                     photosToSend.add(photosToView.get(i));
                 }
             }
 
         }
         Intent myIntent = new Intent(MapsActivity.this, PhotoActivity.class);
-
-
 
 
         myIntent.putExtra("photos", photosToSend);
@@ -165,7 +158,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     }
 
     ArrayList<String> photosToView = new ArrayList<String>();
-    private void getPictures () {
+
+    private void getPictures() {
         //Same idea as above: get reference to database
         FirebaseDatabase database = FirebaseDatabase.getInstance();
 
@@ -181,11 +175,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
                 markers = new ArrayList<MarkerOptions>();
 
-                for (DataSnapshot photoX: dataSnapshot.getChildren()) {
-                    if(photoX.child("location")!=null&&photoX.child("location").child("longitude")!=null&&photoX.child("location").child("latitude")!=null) {
+                for (DataSnapshot photoX : dataSnapshot.getChildren()) {
+                    if (photoX.child("location") != null && photoX.child("location").child("longitude") != null && photoX.child("location").child("latitude") != null) {
 
-                        if(photoX.child("location").child("longitude").getValue()!=null&&photoX.child("location").child("latitude").getValue()!=null)
-                        {
+                        if (photoX.child("location").child("longitude").getValue() != null && photoX.child("location").child("latitude").getValue() != null) {
                             Double longitude = (Double) photoX.child("location").child("longitude").getValue();
                             Double latitude = (Double) photoX.child("location").child("latitude").getValue();
 
@@ -212,14 +205,14 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         });
 
 
-
     }
-ArrayList<MarkerOptions> markers ;
+
+    ArrayList<MarkerOptions> markers;
 
     @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data){
-        if(requestCode == 111 && resultCode == this.RESULT_OK){
-            Intent cameraIntent = new Intent( this, CameraActivity.class);
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == 111 && resultCode == this.RESULT_OK) {
+            Intent cameraIntent = new Intent(this, CameraActivity.class);
             cameraIntent.putExtras(data.getExtras());
             LocationManager locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
             Criteria criteria = new Criteria();
@@ -227,7 +220,7 @@ ArrayList<MarkerOptions> markers ;
                 Location loc = locationManager.getLastKnownLocation(locationManager.getBestProvider(criteria, false));
                 cameraIntent.putExtra("location", loc);
 
-            }catch (SecurityException e){
+            } catch (SecurityException e) {
                 e.printStackTrace();
             }
             startActivity(cameraIntent);

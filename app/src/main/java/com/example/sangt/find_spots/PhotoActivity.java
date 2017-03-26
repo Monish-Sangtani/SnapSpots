@@ -1,5 +1,7 @@
 package com.example.sangt.find_spots;
 
+import android.graphics.Picture;
+import android.location.Location;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
@@ -10,35 +12,112 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.ViewFlipper;
 
 import com.bumptech.glide.Glide;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.*;
 
 import java.util.ArrayList;
 
 public class PhotoActivity extends AppCompatActivity {
-    private ImageView image;
-    private TextView description;
-    private String url="https://firebasestorage.googleapis.com/v0/b/snapspots-14595.appspot.com/o/earth.png?alt=media&token=33b6f912-68ea-48bd-b1ec-cc000d9e813c";
+    private ImageView mImage;
+    private TextView mDescription;
+
+    private String mPhotoKey;
+
+    FirebaseUser mUser;
+    FirebaseAuth mAuth;
+    FirebaseDatabase mDatabase;
+    StorageReference mStorageRef;
+
+    ArrayList<Photo> mPhotos;
+
+
+    private PhotoActivity TAG = this;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_photo);
         setTitle("View Photos");
 
-        ArrayList<String> photoIds = (ArrayList<String>)getIntent().getSerializableExtra("photos");
+        mAuth = FirebaseAuth.getInstance();
+        mUser = mAuth.getCurrentUser();
+        mDatabase = FirebaseDatabase.getInstance();
+        mStorageRef = FirebaseStorage.getInstance().getReference();
 
-        for(String x: photoIds)
-        {
-            Log.d("SWAG: "+x,"d");
+
+        mPhotos = new ArrayList<Photo>();
+
+        //Same idea as above: get reference to database
+        FirebaseDatabase database = FirebaseDatabase.getInstance();
+        //Get reference to table (can use orderBy... to get a certain ordering of the data)
+        DatabaseReference photosRef = database.getReference("Photos");
+
+
+        ArrayList<String> photoIds = (ArrayList<String>) getIntent().getSerializableExtra("photos");
+
+        for (String x : photoIds) {
+            Log.d("SWAG: " + x, "d");
         }
 
-        image = (ImageView) findViewById(R.id.current_picture);
-        description = (TextView) findViewById(R.id.current_picture_description);
+        mImage = (ImageView) findViewById(R.id.current_picture);
+        mDescription = (TextView) findViewById(R.id.current_picture_description);
 
-        Glide.with(this).load(url).into(image);
+        getPictures();
 
-        description.setText("Image Description Text Goes Here");
+
+
+//        Glide.with(this).load(url).into(mImage);
+
+
+    }
+
+
+    private void getPictures() {
+        FirebaseDatabase database = FirebaseDatabase.getInstance();
+        DatabaseReference photosRef = database.getReference("pictures").child("CSLgZ1y7yWTTOoZRqUCbIwlnZP13");
+
+        //Add listener to database to get values
+        photosRef.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                for (DataSnapshot photoX : dataSnapshot.getChildren()) {
+                    if (photoX.child("location") != null && photoX.child("location").child("longitude") != null && photoX.child("location").child("latitude") != null) {
+
+                        if (photoX.child("location").child("longitude").getValue() != null && photoX.child("location").child("latitude").getValue() != null) {
+                            Photo photo = new Photo(null,
+                                    (String) photoX.child("creationDate").getValue(),
+                                    (String) photoX.child("expirationDate").getValue(),
+                                    (String) photoX.child("comment").getValue(),
+                                    (String) photoX.child("creator").getValue());
+                            photo.setUri(photoX.child("uri").toString());
+                            photo.setId(photoX.child("id").toString());
+
+                            mPhotos.add(photo);
+                        }
+                    }
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                //Error catching here
+            }
+        });
+
+
     }
 
 }
+
+
