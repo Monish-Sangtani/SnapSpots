@@ -2,19 +2,25 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:paddingLeft="16dp"
-    android:paddingRight="16dp"
     android:orientation="vertical"
     >
-    <ImageView
-        android:id="@+id/current_picture"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        />
-    <TextView
-        android:id="@+id/current_picture_description"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        />
+
+    <ViewFlipper
+        android:id="@+id/photo_view_flipper"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+    </ViewFlipper>
+
+    <!--<ImageView-->
+        <!--android:id="@+id/current_picture"-->
+        <!--android:layout_width="wrap_content"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:layout_gravity="center"-->
+        <!--/>-->
+    <!--<TextView-->
+        <!--android:id="@+id/current_picture_description"-->
+        <!--android:layout_width="wrap_content"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--/>-->
 </LinearLayout>
