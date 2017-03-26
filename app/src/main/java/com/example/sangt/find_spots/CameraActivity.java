@@ -1,17 +1,19 @@
 package com.example.sangt.find_spots;
 
+import android.app.Activity;
+import android.app.DatePickerDialog;
 import android.graphics.Bitmap;
-import android.graphics.Picture;
 import android.location.Location;
 import android.net.Uri;
-import android.os.Debug;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.util.Log;
-import android.widget.Toast;
+import android.view.View;
+import android.widget.Button;
+import android.widget.DatePicker;
+import android.widget.ImageView;
+import android.widget.TextView;
 
-import com.google.android.gms.fitness.data.Goal;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
@@ -29,9 +31,8 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.HashMap;
-
-import static android.R.attr.data;
 
 public class CameraActivity extends AppCompatActivity {
 
@@ -39,6 +40,13 @@ public class CameraActivity extends AppCompatActivity {
     FirebaseAuth mAuth;
     FirebaseDatabase mDatabase;
     StorageReference mStorageRef;
+    Calendar myCalendar = Calendar.getInstance();
+    Date currentDate = myCalendar.getTime();
+
+
+    private DatePickerDialog.OnDateSetListener date;
+    SimpleDateFormat dateFormat = new SimpleDateFormat("MM/dd/yy hh:mm:ss");
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,27 +58,71 @@ public class CameraActivity extends AppCompatActivity {
         mUser = mAuth.getCurrentUser();
         mDatabase = FirebaseDatabase.getInstance();
         mStorageRef = FirebaseStorage.getInstance().getReference();
-        Bundle extras = getIntent().getExtras();
+        final Bundle extras = getIntent().getExtras();
 
         setContentView(R.layout.activity_camera);
-//        Bundle extras = savedInstanceState.getExtras();
-        Bitmap imageBitmap = (Bitmap) extras.get("data");
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        imageBitmap.compress(Bitmap.CompressFormat.PNG, 100, baos);
-        byte[] imageData = baos.toByteArray();
-        Location loc = (Location) extras.get("location");
-        addImageToDatabase(mUser.getUid(), loc, imageData);
+
+        ImageView image = (ImageView) findViewById(R.id.photoImageView);
+        Button sendButton = (Button) findViewById(R.id.sendPhotoButton);
+        final TextView deletionDate = (TextView) findViewById(R.id.deletionDateView);
+
+        final Bitmap imageBitmap = (Bitmap) extras.get("data");
+        final Activity currentActivity = this;
+        image.setImageBitmap(imageBitmap);
+
+        sendButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                imageBitmap.compress(Bitmap.CompressFormat.PNG, 100, baos);
+                byte[] imageData = baos.toByteArray();
+                Location loc = (Location) extras.get("location");
+                addImageToDatabase(mUser.getUid(), loc, imageData);
+                currentActivity.finish();
+            }
+        });
+
+
+
+        date = new DatePickerDialog.OnDateSetListener() {
+            @Override
+            public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
+                myCalendar.set(Calendar.YEAR, year);
+                myCalendar.set(Calendar.MONTH, month);
+                myCalendar.set(Calendar.DAY_OF_MONTH, dayOfMonth);
+                updateLabel(deletionDate);
+
+            }
+        };
+
+        deletionDate.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+
+                DatePickerDialog dialog = new DatePickerDialog(findViewById(android.R.id.content).getContext(), date,
+                        myCalendar.get(Calendar.YEAR), myCalendar.get(Calendar.MONTH), myCalendar.get(Calendar.DAY_OF_MONTH));
+                dialog.getDatePicker().setMinDate(System.currentTimeMillis());
+                dialog.setTitle("Set Deletion Date");
+                dialog.show();
+            }
+        });
+
+
+        //        Bundle extras = savedInstanceState.getExtras();
+
 
     }
 
     private void addImageToDatabase(String clientId, Location location, byte[] imageData){
         final DatabaseReference pictures = mDatabase.getReference("pictures").child(clientId);
         final String imageKey = pictures.push().getKey();
+        final TextView messageView = (TextView) findViewById(R.id.messageTextView);
 
-        Calendar calObj = Calendar.getInstance();
-        SimpleDateFormat dateFormat = new SimpleDateFormat("MM/dd/yy hh:mm:ss");
-        String date = dateFormat.format(calObj.getTime());
-        final Photo pic = new Photo(location, date, "", "picture comment", clientId);
+
+        String date = dateFormat.format(myCalendar.getTime());
+        String currentDateStr = dateFormat.format(currentDate);
+        final Photo pic = new Photo(location, currentDateStr, date, messageView.getText().toString(), clientId);
         pic.setId(imageKey);
 
         ByteArrayInputStream inputStream = new ByteArrayInputStream(imageData);
@@ -93,6 +145,13 @@ public class CameraActivity extends AppCompatActivity {
 
             }
         });
+    }
+
+
+    private void updateLabel(TextView editText){
+        SimpleDateFormat dateFormatVis = new SimpleDateFormat("MM/dd/yy");
+
+        editText.setText("Will be deleted at the end of: " + dateFormatVis.format((myCalendar.getTime())));
     }
 
 
@@ -137,6 +196,7 @@ public class CameraActivity extends AppCompatActivity {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 //Add code here for when data is found
+
             }
 
             @Override
