@@ -11,8 +11,10 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutCompat;
 import android.util.Log;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.AnimationUtils;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -33,12 +35,8 @@ import com.google.firebase.storage.*;
 import java.util.ArrayList;
 
 public class PhotoActivity extends AppCompatActivity {
-    private ImageView mImage;
-    private TextView mDescription;
 
     private ViewFlipper mVF;
-
-    private String mPhotoKey;
 
     FirebaseUser mUser;
     FirebaseAuth mAuth;
@@ -63,7 +61,6 @@ public class PhotoActivity extends AppCompatActivity {
         mDatabase = FirebaseDatabase.getInstance();
         mStorageRef = FirebaseStorage.getInstance().getReference();
 
-
         mPhotos = new ArrayList<Photo>();
 
         //Same idea as above: get reference to database
@@ -71,22 +68,13 @@ public class PhotoActivity extends AppCompatActivity {
         //Get reference to table (can use orderBy... to get a certain ordering of the data)
         DatabaseReference photosRef = database.getReference("Photos");
 
-
         mPhotoIds = (ArrayList<String>) getIntent().getSerializableExtra("photos");
 
         for (String x : mPhotoIds) {
             Log.d("SWAG: " + x, "d");
         }
 
-//        mImage = (ImageView) findViewById(R.id.current_picture);
-//        mDescription = (TextView) findViewById(R.id.current_picture_description);
-
         getPictures();
-
-
-
-//        Glide.with(this).load(url).into(mImage);
-
 
     }
 
@@ -99,7 +87,6 @@ public class PhotoActivity extends AppCompatActivity {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 for (DataSnapshot photoX : dataSnapshot.getChildren()) {
-                    Log.w("CHILD ID: "+photoX.child("id").getValue(), "A*******");
 
                     if(mPhotoIds.contains(photoX.child("id").getValue().toString())){
                         Photo photo = new Photo(null,
@@ -108,7 +95,6 @@ public class PhotoActivity extends AppCompatActivity {
                                 (String) photoX.child("comment").getValue(),
                                 (String) photoX.child("creator").getValue());
                         photo.setUri(photoX.child("uri").getValue().toString());
-                        Log.w(photo.getUri(), "d*****");
                         photo.setId(photoX.child("id").toString());
 
                         mPhotos.add(photo);
@@ -121,6 +107,7 @@ public class PhotoActivity extends AppCompatActivity {
                     ll.setLayoutParams(new LinearLayoutCompat.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT,LinearLayout.LayoutParams.MATCH_PARENT));
                     ll.setOrientation(LinearLayout.VERTICAL);
 
+
                     ImageView newImageView = new ImageView(TAG);
                     newImageView.setLayoutParams( new LinearLayoutCompat.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT,LinearLayout.LayoutParams.WRAP_CONTENT));
                     ll.addView(newImageView);
@@ -132,10 +119,39 @@ public class PhotoActivity extends AppCompatActivity {
                     description.setText(p.getComment());
 
                     mVF.addView(ll);
-                    
+
                 }
-                mVF.setFlipInterval(300);
-                mVF.startFlipping();
+                mVF.setOnTouchListener(new View.OnTouchListener() {
+                    @Override
+                    public boolean onTouch(View v, MotionEvent event) {
+
+                        float downX=0;
+                        switch (event.getAction()){
+                            case MotionEvent.ACTION_DOWN:
+                            {
+                                // store the X value when the user's finger was pressed down
+                                downX = event.getX();
+                                break;
+                            }
+                            case MotionEvent.ACTION_UP: {
+                                // Get the X value when the user released his/her finger
+                                float currentX = event.getX();
+
+                                // going backwards: pushing stuff to the right
+                                if (downX < currentX) {
+                                    mVF.showPrevious();
+                                }
+                                // going forwards: pushing stuff to the left
+                                if (downX > currentX) {
+                                    // Flip!
+                                    mVF.showNext();
+                                }
+                                break;
+                            }
+                        }
+                        return true;
+                    }
+                });
             }
 
             @Override
