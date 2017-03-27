@@ -22,6 +22,10 @@ public class Photo implements Parcelable {
     private String creator;
     private String uri;
 
+    public Photo(){
+
+    }
+
     public Photo(Location location, String creationDate, String expirationDate, String comment, String creator){
         setLat(location.getLatitude());
         setLon(location.getLongitude());
