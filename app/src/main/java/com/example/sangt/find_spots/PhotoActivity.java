@@ -92,9 +92,8 @@ public class PhotoActivity extends AppCompatActivity {
             ll.setLayoutParams(new LinearLayoutCompat.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT));
             ll.setOrientation(LinearLayout.VERTICAL);
 
-
             ImageView newImageView = new ImageView(TAG);
-            newImageView.setLayoutParams(new LinearLayoutCompat.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT));
+            newImageView.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, 0,.5f));
             ll.addView(newImageView);
             Glide.with(TAG).load(Uri.parse(p.getUri())).into(newImageView);
 
