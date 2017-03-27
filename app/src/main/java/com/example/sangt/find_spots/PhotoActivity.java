@@ -31,6 +31,7 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.*;
 
@@ -121,16 +122,19 @@ public class PhotoActivity extends AppCompatActivity {
                     ll.addView(description);
                     description.setText(p.getComment());
 
-                    if(mUser.toString() == p.getCreator()){
+                    if(mUser.getUid() == p.getCreator() || mUser.getEmail().equals("test@test.com")){
                         Button btnDelete = new Button(TAG);
                         btnDelete.setLayoutParams(new LinearLayoutCompat.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT));
-                        btnDelete.setGravity(Gravity.CENTER_HORIZONTAL);
+                        btnDelete.setGravity(Gravity.CENTER_HORIZONTAL|Gravity.BOTTOM | Gravity.LEFT);
+                        btnDelete.setText("Delete");
+                        Log.w("Key to delete: " + p.getId(), "d**************");
+                        btnDelete.setOnClickListener(new DeleteButtonOnClickListener(p.getId()));
                         ll.addView(btnDelete);
                     }
 
                     TextView photoNumber = new TextView(TAG);
                     photoNumber.setLayoutParams(new LinearLayoutCompat.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT,LinearLayout.LayoutParams.WRAP_CONTENT));
-                    photoNumber.setGravity(Gravity.RIGHT);
+                    photoNumber.setGravity(Gravity.RIGHT | Gravity.BOTTOM);
                     photoNumber.setText(i + "/" + mPhotos.size());
                     ll.addView(photoNumber);
                     i++;
