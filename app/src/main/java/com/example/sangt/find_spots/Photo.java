@@ -107,10 +107,12 @@ public class Photo implements Parcelable {
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeDouble(lat);
         dest.writeDouble(lon);
+        dest.writeString(id);
         dest.writeString(creationDate);
         dest.writeString(expirationDate);
         dest.writeString(comment);
         dest.writeString(creator);
+        dest.writeString(uri);
     }
 
     public static final Parcelable.Creator<Photo> CREATOR = new Parcelable.Creator<Photo>(){
@@ -126,10 +128,12 @@ public class Photo implements Parcelable {
     private Photo(Parcel in){
         lat = in.readDouble();
         lon = in.readDouble();
+        id = in.readString();
         creationDate = in.readString();
         expirationDate = in.readString();
         comment = in.readString();
         creator = in.readString();
+        uri = in.readString();
     }
 
 

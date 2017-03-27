@@ -214,6 +214,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                         {
                             Double longitude = (Double) photoX.child("location").child("longitude").getValue();
                             Double latitude = (Double) photoX.child("location").child("latitude").getValue();
+                            Photo photo = photoX.getValue(Photo.class);
 
                             photosToView.add(photoX.getKey().toString());
                             Log.d(photoX.getKey().toString(), "d");

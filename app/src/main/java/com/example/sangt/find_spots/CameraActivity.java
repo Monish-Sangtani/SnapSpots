@@ -154,7 +154,10 @@ public class CameraActivity extends AppCompatActivity {
         editText.setText("Will be deleted at the end of: " + dateFormatVis.format((myCalendar.getTime())));
     }
 
+    private boolean validReturn(){
 
+        return false;
+    }
 
     //This places the picture information in the database
     private void savePicture(Photo photo){
