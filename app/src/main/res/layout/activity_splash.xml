@@ -11,10 +11,13 @@
     tools:context="com.example.sangt.find_spots.Splash">
 
     <TextView
+        android:id="@+id/textView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Hello World!"
-        android:id="@+id/textView" />
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"
+        android:text="Snap Spots"
+        android:textSize="30sp" />
 
     <Button
         android:text="Start!"
@@ -26,4 +29,13 @@
         android:layout_alignParentStart="true"
         android:layout_alignParentRight="true"
         android:layout_alignParentEnd="true" />
+
+    <TextView
+        android:id="@+id/textView8"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentStart="true"
+        android:layout_below="@+id/textView"
+        android:layout_marginTop="41dp"
+        android:text="Use your location to find interesting things happening around you!" />
 </RelativeLayout>

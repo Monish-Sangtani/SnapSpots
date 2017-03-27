@@ -213,6 +213,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                         {
                             Double longitude = (Double) photoX.child("lon").getValue();
                             Double latitude = (Double) photoX.child("lat").getValue();
+
+
                             Photo photo = photoX.getValue(Photo.class);
 
 
