@@ -24,13 +24,13 @@ public class DeleteButtonOnClickListener implements View.OnClickListener {
     @Override
     public void onClick(View v) {
         FirebaseDatabase database = FirebaseDatabase.getInstance();
-        DatabaseReference photosRef = database.getReference("pictures").child("ChiNfBGWOYRekw95RT4toABezwp2");
+        DatabaseReference photosRef = database.getReference("pictures");
 
         photosRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 for (DataSnapshot pictureSnapshot: dataSnapshot.getChildren()) {
-                    if(pictureSnapshot.getKey().toString().equals(dataKey)){
+                    if(pictureSnapshot.getKey().equals(dataKey)){
                         pictureSnapshot.getRef().removeValue();
                     }
                 }

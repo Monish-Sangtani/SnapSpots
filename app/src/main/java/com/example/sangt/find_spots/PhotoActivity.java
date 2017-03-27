@@ -83,29 +83,10 @@ public class PhotoActivity extends AppCompatActivity {
 
 
     private void getPictures() {
-        FirebaseDatabase database = FirebaseDatabase.getInstance();
-        DatabaseReference photosRef = database.getReference("pictures").child("ChiNfBGWOYRekw95RT4toABezwp2");
 
-        photosRef.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                for (DataSnapshot photoX : dataSnapshot.getChildren()) {
-
-                    if(mPhotoIds.contains(photoX.child("id").getValue().toString())){
-                        Photo photo = new Photo(null,
-                                (String) photoX.child("creationDate").getValue(),
-                                (String) photoX.child("expirationDate").getValue(),
-                                (String) photoX.child("comment").getValue(),
-                                (String) photoX.child("creator").getValue());
-                        photo.setUri(photoX.child("uri").getValue().toString());
-                        photo.setId(photoX.child("id").getValue().toString());
-
-                        mPhotos.add(photo);
-                    }
-                }
                 mVF.removeAllViews();
                 int i = 1;
-                for(Photo p : mPhotos){
+                for(Photo p : mPhotoIds){
 
                     LinearLayout ll = new LinearLayout(TAG);
                     ll.setLayoutParams(new LinearLayoutCompat.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT,LinearLayout.LayoutParams.MATCH_PARENT));
@@ -124,7 +105,7 @@ public class PhotoActivity extends AppCompatActivity {
 
                     if(mUser.getUid() == p.getCreator() || mUser.getEmail().equals("test@test.com")){
                         Button btnDelete = new Button(TAG);
-                        btnDelete.setLayoutParams(new LinearLayoutCompat.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT));
+                        btnDelete.setLayoutParams(new LinearLayoutCompat.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT));
                         btnDelete.setGravity(Gravity.CENTER_HORIZONTAL|Gravity.BOTTOM | Gravity.LEFT);
                         btnDelete.setText("Delete");
                         btnDelete.setOnClickListener(new DeleteButtonOnClickListener(p.getId(), TAG));
@@ -134,7 +115,7 @@ public class PhotoActivity extends AppCompatActivity {
                     TextView photoNumber = new TextView(TAG);
                     photoNumber.setLayoutParams(new LinearLayoutCompat.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT,LinearLayout.LayoutParams.WRAP_CONTENT));
                     photoNumber.setGravity(Gravity.RIGHT | Gravity.BOTTOM);
-                    photoNumber.setText(i + "/" + mPhotos.size());
+                    photoNumber.setText(i + "/" + mPhotoIds.size());
                     ll.addView(photoNumber);
                     i++;
                     mVF.addView(ll);
@@ -173,15 +154,7 @@ public class PhotoActivity extends AppCompatActivity {
                 });
             }
 
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-                //Error catching here
-            }
-        });
-
-
     }
 
-}
 
 
