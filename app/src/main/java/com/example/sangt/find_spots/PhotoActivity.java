@@ -98,7 +98,7 @@ public class PhotoActivity extends AppCompatActivity {
                                 (String) photoX.child("comment").getValue(),
                                 (String) photoX.child("creator").getValue());
                         photo.setUri(photoX.child("uri").getValue().toString());
-                        photo.setId(photoX.child("id").toString());
+                        photo.setId(photoX.child("id").getValue().toString());
 
                         mPhotos.add(photo);
                     }
@@ -127,7 +127,6 @@ public class PhotoActivity extends AppCompatActivity {
                         btnDelete.setLayoutParams(new LinearLayoutCompat.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT));
                         btnDelete.setGravity(Gravity.CENTER_HORIZONTAL|Gravity.BOTTOM | Gravity.LEFT);
                         btnDelete.setText("Delete");
-                        Log.w("Key to delete: " + p.getId(), "d**************");
                         btnDelete.setOnClickListener(new DeleteButtonOnClickListener(p.getId()));
                         ll.addView(btnDelete);
                     }

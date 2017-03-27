@@ -18,6 +18,7 @@ public class DeleteButtonOnClickListener implements View.OnClickListener {
     String dataKey;
     public DeleteButtonOnClickListener(String key){
         dataKey = key;
+        Log.w("Key " + key, "d**************");
     }
     @Override
     public void onClick(View v) {
