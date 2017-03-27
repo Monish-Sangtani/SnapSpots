@@ -50,7 +50,10 @@ import com.google.maps.android.clustering.ClusterItem;
 import com.google.maps.android.clustering.ClusterManager;
 
 import java.io.ByteArrayOutputStream;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -205,6 +208,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             public void onDataChange(DataSnapshot dataSnapshot) {
 
 
+                mClusterManager.clearItems();
+                photosToView = new ArrayList<Photo>();
+
                 markers = new ArrayList<MarkerOptions>();
 
                 for (DataSnapshot photoX: dataSnapshot.getChildren()) {
@@ -217,6 +223,19 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
                             Photo photo = photoX.getValue(Photo.class);
 
+//                            SimpleDateFormat dateFormat = new SimpleDateFormat("MM/dd/yy hh:mm:ss");
+//                            Calendar myCalendar = Calendar.getInstance();
+//                            Date currentDate = myCalendar.getTime();
+//
+//
+//                            String date = dateFormat.format(myCalendar.getTime());
+//                            String currentDateStr = dateFormat.format(currentDate);
+
+//                            if(!currentDate.before(new Date(dateFormat.format(photo.getExpirationDate()))))
+//                            {
+//                                //delete
+//                                Log.d("DELETEDDELETEDELETE","d");
+//                            }
 
 //                            Photo photo = new Photo(longitude,latitude,
 //                                    (String) photoX.child("creationDate").getValue(),
