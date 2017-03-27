@@ -1,5 +1,4 @@
 package com.example.sangt.find_spots;
-
 import android.Manifest;
 
 
@@ -24,6 +23,8 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
 
+
+
 import com.google.android.gms.instantapps.PackageManagerWrapper;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -32,6 +33,11 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+
+
+
+
+
 import com.google.firebase.auth.FirebaseAuth;
 
 import com.google.firebase.database.DataSnapshot;
@@ -39,6 +45,9 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.google.maps.android.clustering.Cluster;
+import com.google.maps.android.clustering.ClusterItem;
+import com.google.maps.android.clustering.ClusterManager;
 
 import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
@@ -47,11 +56,13 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-public class MapsActivity extends FragmentActivity implements OnMapReadyCallback, GoogleMap.OnMarkerClickListener {
+public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
 
     private GoogleMap mMap;
     private Button btnAddSpot;
     private FirebaseAuth auth;
+    private ClusterManager<CustomMarker> mClusterManager;
+
 
     //private ClusterManager<MyItem> mClusterManager;
 
@@ -64,8 +75,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
 
-        getPictures();
-        btnAddSpot = (Button) findViewById(R.id.btn_add);
+
+
+       // getPictures();
+        btnAddSpot= (Button) findViewById(R.id.btn_add);
         btnAddSpot.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -79,17 +92,20 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             }
         });
 
+
+
+
         auth = FirebaseAuth.getInstance();
         if (auth.getCurrentUser() != null) {
-            Toast.makeText(getApplication(), auth.getCurrentUser().getEmail() + " Logged In Successfully", Toast.LENGTH_LONG).show();
+            Toast.makeText(getApplication(), auth.getCurrentUser().getEmail()+" Logged In Successfully",Toast.LENGTH_LONG).show();
         }
 
         mapFragment.getMapAsync(this);
     }
 
 
-    private static final String[] INITIAL_PERMS = {
-            Manifest.permission.ACCESS_FINE_LOCATION,
+    private static final String[] INITIAL_PERMS={
+        Manifest.permission.ACCESS_FINE_LOCATION,
             Manifest.permission.ACCESS_COARSE_LOCATION
     };
 
@@ -113,53 +129,76 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         //mMap.addMarker(new MarkerOptions().position(sydney).title("Marker in Sydney"));
         getPictures();
         // mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney));
-        mMap.setOnMarkerClickListener(this);
+        //mMap.setOnMarkerClickListener(this);
+
+        mClusterManager = new ClusterManager<CustomMarker>(this, mMap);
+
+        mMap.setOnCameraIdleListener(mClusterManager);
+        mMap.setOnMarkerClickListener(mClusterManager);
+
+        //mClusterManager.onMarkerClick()
+
 
 
         mMap.getUiSettings().setMyLocationButtonEnabled(true);
         mMap.getUiSettings().setMapToolbarEnabled(true);
+
+
+        mClusterManager.setOnClusterItemClickListener(new ClusterManager.OnClusterItemClickListener<CustomMarker>() {
+            @Override
+            public boolean onClusterItemClick(CustomMarker item) {
+
+                ArrayList<String> photosToSend = new ArrayList<String>();
+
+                for(int i=0;i<markers.size();i++)
+                {
+                    if(item.getPosition().equals(markers.get(i).getPosition()))
+                    {
+                        photosToSend.add(0,photosToView.get(i));
+                    }
+                    else
+                    {
+                        if(mMap.getProjection().getVisibleRegion().latLngBounds.contains(markers.get(i).getPosition()))
+                        {
+                            photosToSend.add(photosToView.get(i));
+                        }
+                    }
+
+                }
+                Intent myIntent = new Intent(MapsActivity.this, PhotoActivity.class);
+
+
+
+
+                myIntent.putExtra("photos", photosToSend);
+
+
+                startActivity(myIntent);
+                return false;
+            }
+        });
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             this.requestPermissions(INITIAL_PERMS, 1337);
         }
 
         try {
-            mMap.setMyLocationEnabled(true);
+             mMap.setMyLocationEnabled(true);
         } catch (SecurityException e) {
-            Log.d("D", "NO PERMISION NO PERMISSION");
+            Log.d("D","NO PERMISION NO PERMISSION" );
         }
 
 
     }
 
-    @Override
-    public boolean onMarkerClick(Marker marker) {
-
-        ArrayList<String> photosToSend = new ArrayList<String>();
-
-        for (int i = 0; i < markers.size(); i++) {
-            if (marker.getPosition().equals(markers.get(i).getPosition())) {
-                photosToSend.add(0, photosToView.get(i));
-            } else {
-                if (mMap.getProjection().getVisibleRegion().latLngBounds.contains(markers.get(i).getPosition())) {
-                    photosToSend.add(photosToView.get(i));
-                }
-            }
-
-        }
-        Intent myIntent = new Intent(MapsActivity.this, PhotoActivity.class);
 
 
-        myIntent.putExtra("photos", photosToSend);
 
 
-        startActivity(myIntent);
-        return false;
-    }
+
 
     ArrayList<String> photosToView = new ArrayList<String>();
-
-    private void getPictures() {
+    private void getPictures () {
         //Same idea as above: get reference to database
         FirebaseDatabase database = FirebaseDatabase.getInstance();
 
@@ -175,10 +214,11 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
                 markers = new ArrayList<MarkerOptions>();
 
-                for (DataSnapshot photoX : dataSnapshot.getChildren()) {
-                    if (photoX.child("location") != null && photoX.child("location").child("longitude") != null && photoX.child("location").child("latitude") != null) {
+                for (DataSnapshot photoX: dataSnapshot.getChildren()) {
+                    if(photoX.child("location")!=null&&photoX.child("location").child("longitude")!=null&&photoX.child("location").child("latitude")!=null) {
 
-                        if (photoX.child("location").child("longitude").getValue() != null && photoX.child("location").child("latitude").getValue() != null) {
+                        if(photoX.child("location").child("longitude").getValue()!=null&&photoX.child("location").child("latitude").getValue()!=null)
+                        {
                             Double longitude = (Double) photoX.child("location").child("longitude").getValue();
                             Double latitude = (Double) photoX.child("location").child("latitude").getValue();
 
@@ -189,7 +229,11 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
                             MarkerOptions tempMarker = new MarkerOptions().position(tempLoc);
                             markers.add(tempMarker);
-                            mMap.addMarker(tempMarker);
+
+                            mClusterManager.addItem(new CustomMarker(tempMarker));
+                            //mClusterManager.addItem(markers);
+
+                           // mMap.addMarker(tempMarker);
 
                         }
 
@@ -205,14 +249,14 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         });
 
 
-    }
 
-    ArrayList<MarkerOptions> markers;
+    }
+ArrayList<MarkerOptions> markers ;
 
     @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == 111 && resultCode == this.RESULT_OK) {
-            Intent cameraIntent = new Intent(this, CameraActivity.class);
+    public void onActivityResult(int requestCode, int resultCode, Intent data){
+        if(requestCode == 111 && resultCode == this.RESULT_OK){
+            Intent cameraIntent = new Intent( this, CameraActivity.class);
             cameraIntent.putExtras(data.getExtras());
             LocationManager locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
             Criteria criteria = new Criteria();
@@ -220,10 +264,11 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 Location loc = locationManager.getLastKnownLocation(locationManager.getBestProvider(criteria, false));
                 cameraIntent.putExtra("location", loc);
 
-            } catch (SecurityException e) {
+            }catch (SecurityException e){
                 e.printStackTrace();
             }
             startActivity(cameraIntent);
         }
     }
+
 }
