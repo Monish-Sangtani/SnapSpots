@@ -74,7 +74,7 @@ public class PhotoActivity extends AppCompatActivity {
         mPhotoIds = (ArrayList<Photo>) getIntent().getSerializableExtra("photos");
 
         for (Photo x : mPhotoIds) {
-            Log.d("SWAG: " + x.getId()+" "+x.getComment(), "d");
+            Log.d("SWAG: " + x.getId() + " " + x.getComment(), "d");
         }
 
         getPictures();
@@ -84,77 +84,75 @@ public class PhotoActivity extends AppCompatActivity {
 
     private void getPictures() {
 
-                mVF.removeAllViews();
-                int i = 1;
-                for(Photo p : mPhotoIds){
+        mVF.removeAllViews();
+        int i = 1;
+        for (Photo p : mPhotoIds) {
 
-                    LinearLayout ll = new LinearLayout(TAG);
-                    ll.setLayoutParams(new LinearLayoutCompat.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT,LinearLayout.LayoutParams.MATCH_PARENT));
-                    ll.setOrientation(LinearLayout.VERTICAL);
+            LinearLayout ll = new LinearLayout(TAG);
+            ll.setLayoutParams(new LinearLayoutCompat.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT));
+            ll.setOrientation(LinearLayout.VERTICAL);
 
 
-                    ImageView newImageView = new ImageView(TAG);
-                    newImageView.setLayoutParams( new LinearLayoutCompat.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT,LinearLayout.LayoutParams.WRAP_CONTENT));
-                    ll.addView(newImageView);
-                    Glide.with(TAG).load(Uri.parse(p.getUri())).into(newImageView);
+            ImageView newImageView = new ImageView(TAG);
+            newImageView.setLayoutParams(new LinearLayoutCompat.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT));
+            ll.addView(newImageView);
+            Glide.with(TAG).load(Uri.parse(p.getUri())).into(newImageView);
 
-                    TextView description = new TextView(TAG);
-                    description.setLayoutParams( new LinearLayoutCompat.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT,LinearLayout.LayoutParams.WRAP_CONTENT));
-                    ll.addView(description);
-                    description.setText(p.getComment());
-
-                    if(mUser.getUid() == p.getCreator() || mUser.getEmail().equals("test@test.com")){
-                        Button btnDelete = new Button(TAG);
-                        btnDelete.setLayoutParams(new LinearLayoutCompat.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT));
-                        btnDelete.setGravity(Gravity.CENTER_HORIZONTAL|Gravity.BOTTOM | Gravity.LEFT);
-                        btnDelete.setText("Delete");
-                        btnDelete.setOnClickListener(new DeleteButtonOnClickListener(p.getId(), TAG));
-                        ll.addView(btnDelete);
-                    }
-
-                    TextView photoNumber = new TextView(TAG);
-                    photoNumber.setLayoutParams(new LinearLayoutCompat.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT,LinearLayout.LayoutParams.WRAP_CONTENT));
-                    photoNumber.setGravity(Gravity.RIGHT | Gravity.BOTTOM);
-                    photoNumber.setText(i + "/" + mPhotoIds.size());
-                    ll.addView(photoNumber);
-                    i++;
-                    mVF.addView(ll);
-
-                }
-                mVF.setOnTouchListener(new View.OnTouchListener() {
-                    @Override
-                    public boolean onTouch(View v, MotionEvent event) {
-
-                        float downX=0;
-                        switch (event.getAction()){
-                            case MotionEvent.ACTION_DOWN:
-                            {
-                                // store the X value when the user's finger was pressed down
-                                downX = event.getX();
-                                break;
-                            }
-                            case MotionEvent.ACTION_UP: {
-                                // Get the X value when the user released his/her finger
-                                float currentX = event.getX();
-
-                                // going backwards: pushing stuff to the right
-                                if (downX < currentX) {
-                                    mVF.showPrevious();
-                                }
-                                // going forwards: pushing stuff to the left
-                                if (downX > currentX) {
-                                    // Flip!
-                                    mVF.showNext();
-                                }
-                                break;
-                            }
-                        }
-                        return true;
-                    }
-                });
+            TextView description = new TextView(TAG);
+            description.setLayoutParams(new LinearLayoutCompat.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT));
+            ll.addView(description);
+            description.setText(p.getComment());
+            if (mUser.getUid().equals(p.getCreator()) || mUser.getEmail().equals("test@test.com")) {
+                Button btnDelete = new Button(TAG);
+                btnDelete.setLayoutParams(new LinearLayoutCompat.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT));
+                btnDelete.setGravity(Gravity.CENTER_HORIZONTAL | Gravity.BOTTOM | Gravity.LEFT);
+                btnDelete.setText("Delete");
+                btnDelete.setOnClickListener(new DeleteButtonOnClickListener(p.getId(), TAG));
+                ll.addView(btnDelete);
             }
 
+            TextView photoNumber = new TextView(TAG);
+            photoNumber.setLayoutParams(new LinearLayoutCompat.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT));
+            photoNumber.setGravity(Gravity.RIGHT | Gravity.BOTTOM);
+            photoNumber.setText(i + "/" + mPhotoIds.size());
+            ll.addView(photoNumber);
+            i++;
+            mVF.addView(ll);
+
+        }
+        mVF.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+
+                float downX = 0;
+                switch (event.getAction()) {
+                    case MotionEvent.ACTION_DOWN: {
+                        // store the X value when the user's finger was pressed down
+                        downX = event.getX();
+                        break;
+                    }
+                    case MotionEvent.ACTION_UP: {
+                        // Get the X value when the user released his/her finger
+                        float currentX = event.getX();
+
+                        // going backwards: pushing stuff to the right
+                        if (downX < currentX) {
+                            mVF.showPrevious();
+                        }
+                        // going forwards: pushing stuff to the left
+                        if (downX > currentX) {
+                            // Flip!
+                            mVF.showNext();
+                        }
+                        break;
+                    }
+                }
+                return true;
+            }
+        });
     }
+
+}
 
 
 
