@@ -191,19 +191,12 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     }
 
-
-
-
-
-
-
     ArrayList<String> photosToView = new ArrayList<String>();
     private void getPictures () {
         //Same idea as above: get reference to database
         FirebaseDatabase database = FirebaseDatabase.getInstance();
 
-
-        DatabaseReference photosRef = database.getReference("pictures").child("CSLgZ1y7yWTTOoZRqUCbIwlnZP13");
+        DatabaseReference photosRef = database.getReference("pictures").child("ChiNfBGWOYRekw95RT4toABezwp2");
 
 
         //Add listener to database to get values

@@ -16,22 +16,25 @@ import com.google.firebase.database.ValueEventListener;
 
 public class DeleteButtonOnClickListener implements View.OnClickListener {
     String dataKey;
-    public DeleteButtonOnClickListener(String key){
+    PhotoActivity activity;
+    public DeleteButtonOnClickListener(String key, PhotoActivity activity){
         dataKey = key;
-        Log.w("Key " + key, "d**************");
+        this.activity = activity;
     }
     @Override
     public void onClick(View v) {
-        DatabaseReference ref = FirebaseDatabase.getInstance().getReference();
-        Query pictureToDelete = ref.child("pictures").child("CSLgZ1y7yWTTOoZRqUCbIwlnZP13").equalTo(dataKey);
+        FirebaseDatabase database = FirebaseDatabase.getInstance();
+        DatabaseReference photosRef = database.getReference("pictures").child("ChiNfBGWOYRekw95RT4toABezwp2");
 
-        pictureToDelete.addListenerForSingleValueEvent(new ValueEventListener() {
+        photosRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 for (DataSnapshot pictureSnapshot: dataSnapshot.getChildren()) {
-                    Log.w("Key to delete: " + pictureSnapshot.getKey().toString(), "d**************");
-                    pictureSnapshot.getRef().removeValue();
+                    if(pictureSnapshot.getKey().toString().equals(dataKey)){
+                        pictureSnapshot.getRef().removeValue();
+                    }
                 }
+                activity.finish();
             }
 
             @Override

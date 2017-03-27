@@ -84,7 +84,7 @@ public class PhotoActivity extends AppCompatActivity {
 
     private void getPictures() {
         FirebaseDatabase database = FirebaseDatabase.getInstance();
-        DatabaseReference photosRef = database.getReference("pictures").child("CSLgZ1y7yWTTOoZRqUCbIwlnZP13");
+        DatabaseReference photosRef = database.getReference("pictures").child("ChiNfBGWOYRekw95RT4toABezwp2");
 
         photosRef.addValueEventListener(new ValueEventListener() {
             @Override
@@ -127,7 +127,7 @@ public class PhotoActivity extends AppCompatActivity {
                         btnDelete.setLayoutParams(new LinearLayoutCompat.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT));
                         btnDelete.setGravity(Gravity.CENTER_HORIZONTAL|Gravity.BOTTOM | Gravity.LEFT);
                         btnDelete.setText("Delete");
-                        btnDelete.setOnClickListener(new DeleteButtonOnClickListener(p.getId()));
+                        btnDelete.setOnClickListener(new DeleteButtonOnClickListener(p.getId(), TAG));
                         ll.addView(btnDelete);
                     }
 
