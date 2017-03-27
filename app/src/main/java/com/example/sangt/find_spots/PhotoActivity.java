@@ -47,7 +47,7 @@ public class PhotoActivity extends AppCompatActivity {
     StorageReference mStorageRef;
 
     ArrayList<Photo> mPhotos;
-    ArrayList<String> mPhotoIds;
+    ArrayList<Photo> mPhotoIds;
 
     private PhotoActivity TAG = this;
 
@@ -71,10 +71,10 @@ public class PhotoActivity extends AppCompatActivity {
         //Get reference to table (can use orderBy... to get a certain ordering of the data)
         DatabaseReference photosRef = database.getReference("Photos");
 
-        mPhotoIds = (ArrayList<String>) getIntent().getSerializableExtra("photos");
+        mPhotoIds = (ArrayList<Photo>) getIntent().getSerializableExtra("photos");
 
-        for (String x : mPhotoIds) {
-            Log.d("SWAG: " + x, "d");
+        for (Photo x : mPhotoIds) {
+            Log.d("SWAG: " + x.getId()+" "+x.getComment(), "d");
         }
 
         getPictures();

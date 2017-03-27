@@ -148,7 +148,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             @Override
             public boolean onClusterItemClick(CustomMarker item) {
 
-                ArrayList<String> photosToSend = new ArrayList<String>();
+                ArrayList<Photo> photosToSend = new ArrayList<Photo>();
 
                 for(int i=0;i<markers.size();i++)
                 {
@@ -191,12 +191,12 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     }
 
-    ArrayList<String> photosToView = new ArrayList<String>();
+    ArrayList<Photo> photosToView = new ArrayList<Photo>();
     private void getPictures () {
         //Same idea as above: get reference to database
         FirebaseDatabase database = FirebaseDatabase.getInstance();
 
-        DatabaseReference photosRef = database.getReference("pictures").child("ChiNfBGWOYRekw95RT4toABezwp2");
+        DatabaseReference photosRef = database.getReference("pictures");
 
 
         //Add listener to database to get values
@@ -208,14 +208,27 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 markers = new ArrayList<MarkerOptions>();
 
                 for (DataSnapshot photoX: dataSnapshot.getChildren()) {
-                    if(photoX.child("location")!=null&&photoX.child("location").child("longitude")!=null&&photoX.child("location").child("latitude")!=null) {
 
-                        if(photoX.child("location").child("longitude").getValue()!=null&&photoX.child("location").child("latitude").getValue()!=null)
+                        if(photoX.child("lon").getValue()!=null&&photoX.child("lat").getValue()!=null)
                         {
-                            Double longitude = (Double) photoX.child("location").child("longitude").getValue();
-                            Double latitude = (Double) photoX.child("location").child("latitude").getValue();
+                            Double longitude = (Double) photoX.child("lon").getValue();
+                            Double latitude = (Double) photoX.child("lat").getValue();
+                            Photo photo = photoX.getValue(Photo.class);
 
-                            photosToView.add(photoX.getKey().toString());
+
+//                            Photo photo = new Photo(longitude,latitude,
+//                                    (String) photoX.child("creationDate").getValue(),
+//                                    (String) photoX.child("expirationDate").getValue(),
+//                                    (String) photoX.child("comment").getValue(),
+//                                    (String) photoX.child("creator").getValue());
+//                            photo.setUri(photoX.child("uri").getValue().toString());
+//                            photo.setId(photoX.child("id").getValue().toString());
+
+
+                            Log.d("photo"+" "+photo.getComment()+" "+photo.getId(),"d");
+
+
+                            photosToView.add(photo);
                             Log.d(photoX.getKey().toString(), "d");
 
                             LatLng tempLoc = new LatLng(latitude, longitude);
@@ -230,7 +243,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
                         }
 
-                    }
+
 
                 }
             }
