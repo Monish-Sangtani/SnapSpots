@@ -1,15 +1,18 @@
 package com.example.sangt.find_spots;
 
 import android.location.Location;
+import android.os.Parcel;
+import android.os.Parcelable;
 
 /**
  * Created by Alex on 3/10/2017.
  */
 
-public class Photo {
+public class Photo implements Parcelable {
 
     //Location is a Google Maps Class. We can change this if need be
-    private Location location;
+    private double lat;
+    private double lon;
 
     //Only gets assigned when sending to database (Will also be used to find the picture in Storage)
     private String id;
@@ -20,7 +23,8 @@ public class Photo {
     private String uri;
 
     public Photo(Location location, String creationDate, String expirationDate, String comment, String creator){
-        setLocation(location);
+        setLat(location.getLatitude());
+        setLon(location.getLongitude());
         setCreationDate(creationDate);
         setExpirationDate(expirationDate);
         setComment(comment);
@@ -31,13 +35,13 @@ public class Photo {
 
 
     //---------These are just getters and setters for the properties above -------------
-    public Location getLocation() {
-        return location;
-    }
+    public double getLon() { return lon; }
 
-    public void setLocation(Location location) {
-        this.location = location;
-    }
+    public void setLon(double lon) { this.lon = lon; }
+
+    public double getLat() { return lat; }
+
+    public void setLat(double lat) { this.lat = lat; }
 
     public String getId() {
         return id;
@@ -87,7 +91,42 @@ public class Photo {
     public void setUri(String uri) {
         this.uri = uri;
     }
+
     //---------------------------------------------------------------------
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeDouble(lat);
+        dest.writeDouble(lon);
+        dest.writeString(creationDate);
+        dest.writeString(expirationDate);
+        dest.writeString(comment);
+        dest.writeString(creator);
+    }
+
+    public static final Parcelable.Creator<Photo> CREATOR = new Parcelable.Creator<Photo>(){
+        public Photo createFromParcel(Parcel in){
+            return new Photo(in);
+        }
+
+        public Photo[] newArray(int size){
+            return new Photo[size];
+        }
+    };
+
+    private Photo(Parcel in){
+        lat = in.readDouble();
+        lon = in.readDouble();
+        creationDate = in.readString();
+        expirationDate = in.readString();
+        comment = in.readString();
+        creator = in.readString();
+    }
 
 
 }

@@ -115,7 +115,7 @@ public class CameraActivity extends AppCompatActivity {
     }
 
     private void addImageToDatabase(String clientId, Location location, byte[] imageData){
-        final DatabaseReference pictures = mDatabase.getReference("pictures").child(clientId);
+        final DatabaseReference pictures = mDatabase.getReference("pictures");
         final String imageKey = pictures.push().getKey();
         final TextView messageView = (TextView) findViewById(R.id.messageTextView);
 
