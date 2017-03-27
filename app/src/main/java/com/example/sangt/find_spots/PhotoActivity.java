@@ -11,10 +11,12 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutCompat;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.AnimationUtils;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -101,6 +103,7 @@ public class PhotoActivity extends AppCompatActivity {
                     }
                 }
                 mVF.removeAllViews();
+                int i = 1;
                 for(Photo p : mPhotos){
 
                     LinearLayout ll = new LinearLayout(TAG);
@@ -118,6 +121,19 @@ public class PhotoActivity extends AppCompatActivity {
                     ll.addView(description);
                     description.setText(p.getComment());
 
+                    if(mUser.toString() == p.getCreator()){
+                        Button btnDelete = new Button(TAG);
+                        btnDelete.setLayoutParams(new LinearLayoutCompat.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT));
+                        btnDelete.setGravity(Gravity.CENTER_HORIZONTAL);
+                        ll.addView(btnDelete);
+                    }
+
+                    TextView photoNumber = new TextView(TAG);
+                    photoNumber.setLayoutParams(new LinearLayoutCompat.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT,LinearLayout.LayoutParams.WRAP_CONTENT));
+                    photoNumber.setGravity(Gravity.RIGHT);
+                    photoNumber.setText(i + "/" + mPhotos.size());
+                    ll.addView(photoNumber);
+                    i++;
                     mVF.addView(ll);
 
                 }
