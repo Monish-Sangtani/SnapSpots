@@ -50,6 +50,7 @@ import com.google.maps.android.clustering.ClusterItem;
 import com.google.maps.android.clustering.ClusterManager;
 
 import java.io.ByteArrayOutputStream;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -65,6 +66,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private Button btnAddSpot;
     private FirebaseAuth auth;
     private ClusterManager<CustomMarker> mClusterManager;
+    SimpleDateFormat dateFormat = new SimpleDateFormat("MM/dd/yy hh:mm:ss");
+
 
 
     //private ClusterManager<MyItem> mClusterManager;
@@ -197,9 +200,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     ArrayList<Photo> photosToView = new ArrayList<Photo>();
     private void getPictures () {
         //Same idea as above: get reference to database
-        FirebaseDatabase database = FirebaseDatabase.getInstance();
+        final FirebaseDatabase database = FirebaseDatabase.getInstance();
 
-        DatabaseReference photosRef = database.getReference("pictures");
+        final DatabaseReference photosRef = database.getReference("pictures");
 
 
         //Add listener to database to get values
@@ -236,6 +239,35 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 //                                //delete
 //                                Log.d("DELETEDDELETEDELETE","d");
 //                            }
+                            //Date check (if expiration date is before current date then delete Photo)
+                            Calendar calendar = Calendar.getInstance();
+
+                            try {
+                                Date currentDate = calendar.getTime();
+                                Date expDate = dateFormat.parse(photo.getExpirationDate());
+                                if(expDate.before(currentDate)){
+                                    photosRef.child(photo.getId()).removeValue();
+                                }else{
+                                    Log.d("photo"+" "+photo.getComment()+" "+photo.getId(),"d");
+
+
+                                    photosToView.add(photo);
+                                    Log.d(photoX.getKey().toString(), "d");
+
+                                    LatLng tempLoc = new LatLng(latitude, longitude);
+
+                                    MarkerOptions tempMarker = new MarkerOptions().position(tempLoc);
+                                    markers.add(tempMarker);
+
+                                    mClusterManager.addItem(new CustomMarker(tempMarker));
+                                }
+
+                            } catch (ParseException e) {
+                                e.printStackTrace();
+                            }
+                            //Remove from firebase
+
+
 
 //                            Photo photo = new Photo(longitude,latitude,
 //                                    (String) photoX.child("creationDate").getValue(),
@@ -246,18 +278,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 //                            photo.setId(photoX.child("id").getValue().toString());
 
 
-                            Log.d("photo"+" "+photo.getComment()+" "+photo.getId(),"d");
 
-
-                            photosToView.add(photo);
-                            Log.d(photoX.getKey().toString(), "d");
-
-                            LatLng tempLoc = new LatLng(latitude, longitude);
-
-                            MarkerOptions tempMarker = new MarkerOptions().position(tempLoc);
-                            markers.add(tempMarker);
-
-                            mClusterManager.addItem(new CustomMarker(tempMarker));
                             //mClusterManager.addItem(markers);
 
                            // mMap.addMarker(tempMarker);
