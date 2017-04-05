@@ -52,6 +52,17 @@ public class LoginActivityTest extends ActivityInstrumentationTestCase {
         auth.signOut();
     }
 
+    @Test
+    public void testNonexistentUser(){
+        String email = "a@acom";
+        String passwd = " g";
+        FirebaseAuth auth = FirebaseAuth.getInstance();
+        auth.signInWithEmailAndPassword(email, passwd);
+        assertNull(auth.getCurrentUser());
+        auth.signOut();
+    }
+
+
     @After
     public void tearDown() throws Exception {
         mLoginActivity = null;
