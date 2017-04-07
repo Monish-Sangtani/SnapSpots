@@ -10,6 +10,8 @@ import android.graphics.Bitmap;
 import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationManager;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Build;
 import android.provider.MediaStore;
 import android.support.annotation.RequiresApi;
@@ -58,6 +60,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
+import java.util.Random;
 import java.util.Set;
 
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
@@ -88,11 +91,20 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         btnAddSpot.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                //Intent openCamera = new Intent(MapsActivity.this,CameraActivity.class);
-                Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-                if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
-                    startActivityForResult(takePictureIntent, 111);
+
+                if(isNetworkAvailable())
+                {
+                    //Intent openCamera = new Intent(MapsActivity.this,CameraActivity.class);
+                    Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+                    if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
+                        startActivityForResult(takePictureIntent, 111);
+                    }
                 }
+                else
+                {
+                    Toast.makeText(getApplication(), "Must have internet connection.",Toast.LENGTH_LONG).show();
+                }
+
 
 
             }
@@ -109,6 +121,12 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         mapFragment.getMapAsync(this);
     }
 
+    private boolean isNetworkAvailable() {
+        ConnectivityManager connectivityManager
+                = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
+        return activeNetworkInfo != null && activeNetworkInfo.isConnected();
+    }
 
     private static final String[] INITIAL_PERMS={
         Manifest.permission.ACCESS_FINE_LOCATION,
@@ -220,8 +238,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
                         if(photoX.child("lon").getValue()!=null&&photoX.child("lat").getValue()!=null)
                         {
-                            Double longitude = (Double) photoX.child("lon").getValue();
-                            Double latitude = (Double) photoX.child("lat").getValue();
+                           // Double longitude = (Double) photoX.child("lon").getValue();
+                            //Double latitude = (Double) photoX.child("lat").getValue();
 
 
                             Photo photo = photoX.getValue(Photo.class);
@@ -254,11 +272,25 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                     photosToView.add(photo);
                                     Log.d(photoX.getKey().toString(), "d");
 
-                                    LatLng tempLoc = new LatLng(latitude, longitude);
+                                    LatLng tempLoc = new LatLng(photo.getLat(), photo.getLon());
 
                                     MarkerOptions tempMarker = new MarkerOptions().position(tempLoc);
                                     markers.add(tempMarker);
 
+//                                    for(int i=0;i<1000;i++)
+//                                    {
+//                                        Random r = new Random();
+//                                        double randomValue = -90 + (90 - -90) * r.nextDouble();
+//                                        double randomValue2 = -90 + (90 - -90) * r.nextDouble();
+//
+//                                        LatLng t = new LatLng(randomValue, randomValue2);
+//
+//                                        MarkerOptions tm = new MarkerOptions().position(t);
+//                                        mClusterManager.addItem(new CustomMarker(tm));
+//                                        //mMap.addMarker(tm);
+//
+//
+//                                    }
                                     mClusterManager.addItem(new CustomMarker(tempMarker));
                                 }
 
@@ -309,7 +341,20 @@ ArrayList<MarkerOptions> markers ;
             LocationManager locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
             Criteria criteria = new Criteria();
             try {
-                Location loc = locationManager.getLastKnownLocation(locationManager.getBestProvider(criteria, false));
+                String locationProvider=locationManager.getBestProvider(criteria, false);
+                Location loc;
+                if(locationProvider==null)
+                {
+                    loc = new Location("");//provider name is unnecessary
+                    loc.setLatitude(0.0d);//your coords of course
+                    loc.setLongitude(0.0d);
+                }
+                else
+                {
+                    loc = locationManager.getLastKnownLocation(locationProvider);
+                }
+
+
                 cameraIntent.putExtra("location", loc);
 
             }catch (SecurityException e){
