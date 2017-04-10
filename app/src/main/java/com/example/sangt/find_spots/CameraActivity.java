@@ -46,6 +46,7 @@ public class CameraActivity extends AppCompatActivity {
 
     private DatePickerDialog.OnDateSetListener date;
     SimpleDateFormat dateFormat = new SimpleDateFormat("MM/dd/yy hh:mm:ss");
+    SimpleDateFormat expDateFormat = new SimpleDateFormat("MM/dd/yy");
 
 
     @Override
@@ -124,9 +125,9 @@ public class CameraActivity extends AppCompatActivity {
         final TextView messageView = (TextView) findViewById(R.id.messageTextView);
 
 
-        String date = dateFormat.format(myCalendar.getTime());
+        String date = expDateFormat.format(myCalendar.getTime());
         String currentDateStr = dateFormat.format(currentDate);
-        final Photo pic = new Photo(location, currentDateStr, date, messageView.getText().toString(), clientId);
+        final Photo pic = new Photo(location, currentDateStr, date + " 23:59:00", messageView.getText().toString(), clientId);
         pic.setId(imageKey);
 
         ByteArrayInputStream inputStream = new ByteArrayInputStream(imageData);
