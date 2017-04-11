@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AlertDialog;
@@ -54,6 +55,11 @@ public class LoginActivity extends Activity {
                 register();
             }
         });
+
+        SharedPreferences myPrefs = getSharedPreferences("myPrefs", MODE_PRIVATE);
+
+
+        txtEmail.setText(myPrefs.getString("username", ""));
     }
 
 
@@ -103,6 +109,18 @@ public class LoginActivity extends Activity {
                             Toast.makeText(LoginActivity.this, "Email or password invalid", Toast.LENGTH_LONG).show();
 
                         } else {
+
+                            SharedPreferences myPrefs = getSharedPreferences("myPrefs", MODE_PRIVATE);
+
+
+                            SharedPreferences.Editor e = myPrefs.edit();
+                            e.putString("username", txtEmail.getText().toString()); // add or overwrite someValue
+                            e.commit(); // this saves to disk and notifies observers
+
+
+
+
+
                             Intent intent = new Intent(LoginActivity.this, MapsActivity.class);
                             startActivity(intent);
                             finish();
